@@ -29,20 +29,21 @@ const allowedOrigins = [
   'http://localhost:8081',
   'http://127.0.0.1:5173',
   'http://127.0.0.1:8080',
-  'http://127.0.0.1:8081'
-];
+  'http://127.0.0.1:8081',
+  process.env.CLIENT_URL
+].filter(Boolean); // Filter out undefined/null values
 
 app.use(cors({
   origin: function (origin, callback) {
     console.log('CORS request from origin:', origin);
-    // allow requests with no origin (like mobile apps or curl requests)
+    // Allow requests with no origin (like server-to-server, mobile apps, or curl requests)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
     }
-    console.log('CORS blocked origin:', origin);
-    const msg = `CORS policy blocked origin: ${origin}`;
-    return callback(new Error(msg), false);
   },
   credentials: true
 }));
